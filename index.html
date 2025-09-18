@@ -2,95 +2,95 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mi galaxia para ti</title>
+  <title>Galaxia de Palabras ✨</title>
   <style>
-    body {
-      margin: 0;
-      background: black;
-      overflow: hidden;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-    canvas {
-      display: block;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 0;
-    }
-    /* 🌟 Nombre en el centro */
-    .name {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 3em;
-      font-weight: bold;
-      color: #FFD700;
-      text-shadow: 0 0 15px #FFD700, 0 0 30px #FFA500, 0 0 45px #FF4500;
-      z-index: 1;
-    }
+    body { margin: 0; overflow: hidden; background: black; }
+    canvas { display: block; }
   </style>
 </head>
 <body>
-  <!-- Cambia el nombre aquí -->
-  <div class="name">💫 Laura❤️ 💫</div>
-  <canvas id="galaxy"></canvas>
-
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.js"></script>
   <script>
-    const canvas = document.getElementById("galaxy");
-    const ctx = canvas.getContext("2d");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    // Escena, cámara y renderizador
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
+    const renderer = new THREE.WebGLRenderer({antialias:true});
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
+    // Control de movimiento con mouse/touch
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableZoom = true;
+    controls.enableDamping = true;
 
-    // 🌞 Sol en el centro
-    function drawSun() {
-      const gradient = ctx.createRadialGradient(centerX, centerY, 10, centerX, centerY, 100);
-      gradient.addColorStop(0, "yellow");
-      gradient.addColorStop(0.5, "orange");
-      gradient.addColorStop(1, "rgba(255, 140, 0, 0)");
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, 100, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // 🌌 Palabras orbitando
-    const words = [
-      "Te amo ❤️", "Mi vida 🌸", "Eres mi sol ☀️", "Mi alegría 💕", 
-      "Siempre tú 🌙", "Mi princesa 👑", "Mi razón 💖", "Mi cielo 🌌",
-      "Mi todo 💎", "Mi amor eterno ❤️‍🔥", "La más bella 🌹", "Mi estrella ✨"
+    // Palabras bonitas
+    const palabras = [
+      "Amor 💖","Reina 👑","Mi vida 🌹","Luz ✨","Mi cielo ☁️","Alegría 🌸",
+      "Preciosa 🌷","Mi todo 💎","Corazón ❤️","Dulzura 🍯","Eres única 🌟",
+      "Princesa 👸","Sonrisa 😊","Fuerza 💪","Mi paz 🕊️","Encanto 💕"
     ];
 
-    let angle = 0;
+    // Crear miles de palabras distribuidas
+    const loader = new THREE.FontLoader();
+    loader.load("https://threejs.org/examples/fonts/helvetiker_regular.typeface.json", function(font) {
+      const material = new THREE.MeshBasicMaterial({ color: 0xff69b4 });
+      for (let i = 0; i < 2000; i++) { // 👈 aquí decides cuántas palabras (2000 por ejemplo)
+        const palabra = palabras[Math.floor(Math.random() * palabras.length)];
+        const geometry = new THREE.TextGeometry(palabra, {
+          font: font,
+          size: 4,
+          height: 0.5
+        });
+        const mesh = new THREE.Mesh(geometry, material);
 
-    function drawWords() {
-      const radius = 250;
-      ctx.font = "20px Arial";
-      ctx.fillStyle = "white";
+        // Posiciones aleatorias tipo galaxia
+        const radius = Math.random() * 600;
+        const angle1 = Math.random() * Math.PI * 2;
+        const angle2 = Math.random() * Math.PI * 2;
+        mesh.position.set(
+          radius * Math.sin(angle1) * Math.cos(angle2),
+          radius * Math.sin(angle1) * Math.sin(angle2),
+          radius * Math.cos(angle1)
+        );
 
-      words.forEach((word, i) => {
-        const a = angle + (i * (2 * Math.PI / words.length));
-        const x = centerX + Math.cos(a) * radius;
-        const y = centerY + Math.sin(a) * radius;
-        ctx.fillText(word, x, y);
+        mesh.rotation.x = Math.random() * Math.PI;
+        mesh.rotation.y = Math.random() * Math.PI;
+
+        scene.add(mesh);
+      }
+    });
+
+    // Texto en el centro (nombre de ella 💕)
+    loader.load("https://threejs.org/examples/fonts/helvetiker_bold.typeface.json", function(font) {
+      const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+      const geometry = new THREE.TextGeometry("✨Laura✨", {
+        font: font,
+        size: 20,
+        height: 2
       });
+      const centro = new THREE.Mesh(geometry, material);
+      centro.position.set(-50, 0, 0);
+      scene.add(centro);
+    });
 
-      angle += 0.01;
-    }
+    // Cámara inicial
+    camera.position.z = 800;
 
+    // Animación
     function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawSun();
-      drawWords();
       requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
     }
-
     animate();
+
+    // Ajustar pantalla
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
   </script>
 </body>
 </html>
