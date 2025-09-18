@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi galaxia para ti</title>
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      overflow: hidden;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+    /* 🌟 Nombre en el centro */
+    .name {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3em;
+      font-weight: bold;
+      color: #FFD700;
+      text-shadow: 0 0 15px #FFD700, 0 0 30px #FFA500, 0 0 45px #FF4500;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <!-- Cambia el nombre aquí -->
+  <div class="name">💫 Laura❤️ 💫</div>
+  <canvas id="galaxy"></canvas>
+
+  <script>
+    const canvas = document.getElementById("galaxy");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+
+    // 🌞 Sol en el centro
+    function drawSun() {
+      const gradient = ctx.createRadialGradient(centerX, centerY, 10, centerX, centerY, 100);
+      gradient.addColorStop(0, "yellow");
+      gradient.addColorStop(0.5, "orange");
+      gradient.addColorStop(1, "rgba(255, 140, 0, 0)");
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 100, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // 🌌 Palabras orbitando
+    const words = [
+      "Te amo ❤️", "Mi vida 🌸", "Eres mi sol ☀️", "Mi alegría 💕", 
+      "Siempre tú 🌙", "Mi princesa 👑", "Mi razón 💖", "Mi cielo 🌌",
+      "Mi todo 💎", "Mi amor eterno ❤️‍🔥", "La más bella 🌹", "Mi estrella ✨"
+    ];
+
+    let angle = 0;
+
+    function drawWords() {
+      const radius = 250;
+      ctx.font = "20px Arial";
+      ctx.fillStyle = "white";
+
+      words.forEach((word, i) => {
+        const a = angle + (i * (2 * Math.PI / words.length));
+        const x = centerX + Math.cos(a) * radius;
+        const y = centerY + Math.sin(a) * radius;
+        ctx.fillText(word, x, y);
+      });
+
+      angle += 0.01;
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawSun();
+      drawWords();
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
